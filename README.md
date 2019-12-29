@@ -2,7 +2,12 @@
 
 Yii2 backend for MyEvent: Find a venue
 
-## Plan B: Real-estate listing app with same venue booking codebase
+## Plan B: Launch Pivots of same codebase
+
+* Real-estate listing app
+* Chalet-listing app
+* Car-listing app
+* 4-sale kind of deal (Sell everything)
 
 ## Database Structure
 
