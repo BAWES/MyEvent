@@ -29,8 +29,27 @@
  * ```
  */
 return [
-    'Development' => [
-        'path' => 'dev',
+    'Development - Saoud' => [
+        'path' => 'dev-saoud',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'console/runtime',
+            'frontend/runtime',
+            'frontend/web/assets',
+        ],
+        'setExecutable' => [
+            'yii',
+            'yii_test',
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'common/config/codeception-local.php',
+            'frontend/config/main-local.php',
+        ],
+    ],
+    'Development - Khalid' => [
+        'path' => 'dev-khalid',
         'setWritable' => [
             'backend/runtime',
             'backend/web/assets',
