@@ -6,10 +6,9 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 
-$this->title = $model->user_uuid;
+$this->title = $model->user_name;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
 ?>
 <div class="user-view">
 
@@ -29,15 +28,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'user_uuid',
+            // 'user_uuid',
             'user_name',
             'user_email:email',
-            'user_auth_key',
-            'user_password_hash',
-            'user_password_reset_token',
-            'user_status',
-            'user_created_at',
-            'user_updated_at',
+            [
+                'label' => 'Password',
+                'value' => '***',
+            ],
+            [
+                'label' => 'Status',
+                'value' => $model->user_status,
+            ],
+            'user_created_at:datetime',
+            'user_updated_at:datetime',
         ],
     ]) ?>
 

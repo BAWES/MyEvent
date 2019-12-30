@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use Yii;
+use yii\filters\AccessControl;
 use common\models\Admin;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -14,6 +15,8 @@ use yii\filters\VerbFilter;
  */
 class AdminController extends Controller
 {
+    public $enableCsrfValidation = false;
+    
     /**
      * {@inheritdoc}
      */
@@ -24,6 +27,15 @@ class AdminController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
                 ],
             ],
         ];
@@ -65,8 +77,12 @@ class AdminController extends Controller
     public function actionCreate()
     {
         $model = new Admin();
+        $model->scenario = "create";
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            Yii::info('[Admin Added > '.$model->admin_name.'] By '. Yii::$app->user->identity->admin_name, __METHOD__);
+
             return $this->redirect(['view', 'id' => $model->admin_id]);
         }
 
@@ -87,6 +103,9 @@ class AdminController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            Yii::info('[Admin Updated > '.$model->admin_name.'] By '. Yii::$app->user->identity->admin_name, __METHOD__);
+
             return $this->redirect(['view', 'id' => $model->admin_id]);
         }
 
@@ -104,7 +123,11 @@ class AdminController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        Yii::info('[Admin Deleted > '.$model->admin_name.'] By '. Yii::$app->user->identity->admin_name, __METHOD__);
+
+        $model->delete();
 
         return $this->redirect(['index']);
     }

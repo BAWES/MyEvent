@@ -6,10 +6,9 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Admin */
 
-$this->title = $model->admin_id;
+$this->title = $model->admin_name;
 $this->params['breadcrumbs'][] = ['label' => 'Admins', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
 ?>
 <div class="admin-view">
 
@@ -29,15 +28,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'admin_id',
+            // 'admin_id',
             'admin_name',
             'admin_email:email',
-            'admin_auth_key',
-            'admin_password_hash',
-            'admin_password_reset_token',
-            'admin_status',
-            'admin_created_at',
-            'admin_updated_at',
+            [
+                'label' => 'Password',
+                'value' => '***',
+            ],
+            [
+                'label' => 'Status',
+                'value' => $model->status,
+            ],
+            'admin_created_at:datetime',
+            'admin_updated_at:datetime',
         ],
     ]) ?>
 

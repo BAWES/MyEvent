@@ -174,7 +174,7 @@ class m130524_201442_init extends Migration
             'venue_uuid' => $this->integer()->notNull(),
             'photo_url' => $this->string(),
             'venue_uuid' => $this->integer()->notNull(),
-            'photo_created_datetime' => $this->datetime()->notNull(),
+            'photo_created_datetime' => $this->datetime(),
 
         ], $tableOptions);
          

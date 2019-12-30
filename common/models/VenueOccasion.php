@@ -10,8 +10,8 @@ use Yii;
  * @property int $venue_uuid
  * @property int $occasion_uuid
  *
- * @property Occasion $occasionUu
- * @property Venue $venueUu
+ * @property Occasion $occasion
+ * @property Venue $venue
  */
 class VenueOccasion extends \yii\db\ActiveRecord
 {
@@ -50,7 +50,7 @@ class VenueOccasion extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOccasionUu()
+    public function getOccasion()
     {
         return $this->hasOne(Occasion::className(), ['occasion_uuid' => 'occasion_uuid']);
     }
@@ -58,7 +58,7 @@ class VenueOccasion extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getVenueUu()
+    public function getVenue()
     {
         return $this->hasOne(Venue::className(), ['venue_uuid' => 'venue_uuid']);
     }

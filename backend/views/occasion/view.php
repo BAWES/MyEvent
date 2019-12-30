@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Occasion */
 
-$this->title = $model->occasion_uuid;
+$this->title = $model->occasion_name;
 $this->params['breadcrumbs'][] = ['label' => 'Occasions', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);

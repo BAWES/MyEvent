@@ -3,6 +3,9 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\AttributeBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "venue_photo".
@@ -14,25 +17,22 @@ use Yii;
  *
  * @property Venue $venueUu
  */
-class VenuePhoto extends \yii\db\ActiveRecord
-{
+class VenuePhoto extends \yii\db\ActiveRecord {
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'venue_photo';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
-            [['venue_uuid', 'photo_created_datetime'], 'required'],
+            [['venue_uuid'], 'required'],
             [['venue_uuid'], 'integer'],
-            [['photo_created_datetime'], 'safe'],
             [['photo_url'], 'string', 'max' => 255],
             [['venue_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Venue::className(), 'targetAttribute' => ['venue_uuid' => 'venue_uuid']],
         ];
@@ -41,8 +41,7 @@ class VenuePhoto extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'photo_uuid' => 'Photo Uuid',
             'venue_uuid' => 'Venue Uuid',
@@ -52,10 +51,36 @@ class VenuePhoto extends \yii\db\ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'photo_uuid',
+                ],
+                'value' => function() {
+                    if (!$this->photo_uuid)
+                        $this->photo_uuid = Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
+
+                    return $this->photo_uuid;
+                }
+            ],
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'photo_created_datetime',
+                'updatedAtAttribute' => null,
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
-    public function getVenueUu()
-    {
+    public function getVenueUu() {
         return $this->hasOne(Venue::className(), ['venue_uuid' => 'venue_uuid']);
     }
+
 }

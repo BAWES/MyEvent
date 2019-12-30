@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\AttributeBehavior;
 
 /**
  * This is the model class for table "occasion".
@@ -12,21 +13,19 @@ use Yii;
  *
  * @property VenueOccasion[] $venueOccasions
  */
-class Occasion extends \yii\db\ActiveRecord
-{
+class Occasion extends \yii\db\ActiveRecord {
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'occasion';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['occasion_name'], 'required'],
             [['occasion_name'], 'string', 'max' => 255],
@@ -34,10 +33,30 @@ class Occasion extends \yii\db\ActiveRecord
     }
 
     /**
+     * 
+     * @return type
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'occasion_uuid',
+                ],
+                'value' => function() {
+                    if (!$this->occasion_uuid)
+                        $this->occasion_uuid = Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
+
+                    return $this->occasion_uuid;
+                }
+            ]
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'occasion_uuid' => 'Occasion Uuid',
             'occasion_name' => 'Occasion Name',
@@ -47,8 +66,8 @@ class Occasion extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getVenueOccasions()
-    {
+    public function getVenueOccasions() {
         return $this->hasMany(VenueOccasion::className(), ['occasion_uuid' => 'occasion_uuid']);
     }
+
 }

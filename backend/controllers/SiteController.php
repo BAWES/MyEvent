@@ -12,6 +12,7 @@ use backend\models\LoginForm;
  */
 class SiteController extends Controller
 {
+
     /**
      * {@inheritdoc}
      */
@@ -41,6 +42,7 @@ class SiteController extends Controller
         ];
     }
 
+    
     /**
      * {@inheritdoc}
      */

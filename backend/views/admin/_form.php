@@ -16,17 +16,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'admin_email')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'admin_auth_key')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'admin_password_hash')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'admin_password_reset_token')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'admin_status')->textInput() ?>
-
-    <?= $form->field($model, 'admin_created_at')->textInput() ?>
-
-    <?= $form->field($model, 'admin_updated_at')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
