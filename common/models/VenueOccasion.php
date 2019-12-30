@@ -30,7 +30,7 @@ class VenueOccasion extends \yii\db\ActiveRecord
     {
         return [
             [['venue_uuid', 'occasion_uuid'], 'required'],
-            [['venue_uuid', 'occasion_uuid'], 'integer'],
+            [['venue_uuid', 'occasion_uuid'],  'string', 'max' => 36],
             [['occasion_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Occasion::className(), 'targetAttribute' => ['occasion_uuid' => 'occasion_uuid']],
             [['venue_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Venue::className(), 'targetAttribute' => ['venue_uuid' => 'venue_uuid']],
         ];

@@ -46,6 +46,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function rules() {
         return [
+            [['user_uuid'], 'string', 'max' => 36],
+            [['user_uuid'], 'unique'],
             [['user_name', 'user_email'], 'required'],
             [['tempPassword'], 'required', 'on' => 'create'],
             [['tempPassword'], 'safe'],

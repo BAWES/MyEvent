@@ -28,6 +28,8 @@ class Occasion extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['occasion_name'], 'required'],
+            [['occasion_uuid'], 'string', 'max' => 36],
+            [['occasion_uuid'], 'unique'],
             [['occasion_name'], 'string', 'max' => 255],
         ];
     }

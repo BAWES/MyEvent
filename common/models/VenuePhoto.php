@@ -15,7 +15,7 @@ use yii\db\Expression;
  * @property string|null $photo_url
  * @property string $photo_created_datetime
  *
- * @property Venue $venueUu
+ * @property Venue $venue
  */
 class VenuePhoto extends \yii\db\ActiveRecord {
 
@@ -31,8 +31,10 @@ class VenuePhoto extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
+            [['photo_uuid'], 'string', 'max' => 36],
+            [['photo_uuid'], 'unique'],
             [['venue_uuid'], 'required'],
-            [['venue_uuid'], 'integer'],
+            [['venue_uuid'], 'string', 'max' => 36],
             [['photo_url'], 'string', 'max' => 255],
             [['venue_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Venue::className(), 'targetAttribute' => ['venue_uuid' => 'venue_uuid']],
         ];
@@ -77,9 +79,16 @@ class VenuePhoto extends \yii\db\ActiveRecord {
     }
 
     /**
+     * 
+     */
+    public function afterDelete() {
+        Yii::$app->cloudinaryManager->delete("venue-photos/" . $this->photo_url);
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
-    public function getVenueUu() {
+    public function getVenue() {
         return $this->hasOne(Venue::className(), ['venue_uuid' => 'venue_uuid']);
     }
 

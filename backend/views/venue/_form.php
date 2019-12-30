@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use common\models\User;
 use common\models\Occasion;
 use yii\helpers\ArrayHelper;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Venue */
@@ -21,12 +22,22 @@ use yii\helpers\ArrayHelper;
     $occasionArray = ArrayHelper::map($occasionQuery, 'occasion_uuid', 'occasion_name');
 
     $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]);
-    
     ?>
 
     <?= $form->field($model, 'user_uuid')->dropDownList($userArray, ['prompt' => 'Select...'])->label('Username') ?>
 
-    <?= $form->field($model, 'occasion_uuid')->dropDownList($occasionArray, ['prompt' => 'Select...'])->label('Occasion') ?>
+    <?=
+    $form->field($model, 'venue_occasions')->widget(Select2::classname(), [
+        'data' => $occasionArray,
+         'size' => Select2::MEDIUM,
+        'showToggleAll' => false,
+        'options' => ['placeholder' => 'Select ccasions ...'],
+        'pluginOptions' => [
+            'allowClear' => true,
+             'multiple' => true
+        ],
+    ]);
+    ?>
 
     <?= $form->field($model, 'venue_name')->textInput(['maxlength' => true]) ?>
 
@@ -52,13 +63,13 @@ use yii\helpers\ArrayHelper;
 
     <?= $form->field($model, 'venue_restrictions')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'venue_photos[]')->fileInput(['multiple' => true]) ?>
+<?= $form->field($model, 'venue_photos[]')->fileInput(['multiple' => true]) ?>
 
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 
-    <?php ActiveForm::end(); ?>
+<?php ActiveForm::end(); ?>
 
 </div>

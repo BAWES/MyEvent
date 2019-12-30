@@ -59,7 +59,7 @@ class m130524_201442_init extends Migration
          * Create User Table
          */
         $this->createTable('{{%user}}', [
-            'user_uuid' => $this->primaryKey(),
+            'user_uuid' =>  $this->char(36)->notNull(),
             'user_name' => $this->string()->notNull()->unique(),
             'user_email' => $this->string()->notNull()->unique(),
             'user_auth_key' => $this->string(32)->notNull(),
@@ -70,21 +70,26 @@ class m130524_201442_init extends Migration
             'user_updated_at' => $this->datetime()->notNull(),
         ], $tableOptions);
         
+        $this->addPrimaryKey('PK', 'user', 'user_uuid');
+        
          /**
          * Create Occasion Table
          * Occasion for an event. Such as wedding, birthday, valentines, etc.
          */
          $this->createTable('{{%occasion}}', [
-            'occasion_uuid' => $this->primaryKey(),
+            'occasion_uuid' => $this->char(36)->notNull(),
             'occasion_name' => $this->string()->notNull(),
         ], $tableOptions);
          
+        $this->addPrimaryKey('PK', 'occasion', 'occasion_uuid');
+
+                 
          /**
          * Create Venue Table
          */
          $this->createTable('{{%venue}}', [
-            'venue_uuid' => $this->primaryKey(),
-            'user_uuid' => $this->integer()->notNull(),
+            'venue_uuid' =>  $this->char(36)->notNull(),
+            'user_uuid' => $this->char(36)->notNull(),
             'venue_name' => $this->string()->notNull(),
             'venue_location' => $this->string(),
             'venue_location_longitude' => $this->decimal(9, 6),
@@ -100,6 +105,9 @@ class m130524_201442_init extends Migration
             'venue_restrictions' => $this->text(),
         ], $tableOptions);
          
+        $this->addPrimaryKey('PK', 'venue', 'venue_uuid');
+
+                 
          // creates index for column `user_uuid` in venue table
          $this->createIndex(
              'idx-venue-user_uuid',
@@ -124,8 +132,8 @@ class m130524_201442_init extends Migration
          * Relation between venue and occasion
          */
          $this->createTable('{{%venue_occasion}}', [
-            'venue_uuid' => $this->integer()->notNull(),
-            'occasion_uuid' => $this->integer()->notNull(),
+            'venue_uuid' => $this->char(36)->notNull(),
+            'occasion_uuid' => $this->char(36)->notNull(),
             
         ], $tableOptions);
          
@@ -170,15 +178,16 @@ class m130524_201442_init extends Migration
          * Photos of a venue
          */
          $this->createTable('{{%venue_photo}}', [
-            'photo_uuid' => $this->primaryKey(),
-            'venue_uuid' => $this->integer()->notNull(),
+            'photo_uuid' =>  $this->char(36)->notNull(),
+            'venue_uuid' => $this->char(36)->notNull(),
             'photo_url' => $this->string(),
-            'venue_uuid' => $this->integer()->notNull(),
             'photo_created_datetime' => $this->datetime(),
 
         ], $tableOptions);
          
                  
+        $this->addPrimaryKey('PK', 'venue_photo', 'photo_uuid');
+
         // creates index for column `venue_uuid` in venue_photo table
          $this->createIndex(
              'idx-venue-photo-venue_uuid',

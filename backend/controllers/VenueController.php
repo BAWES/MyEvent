@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use common\models\VenuePhoto;
 
 /**
  * VenueController implements the CRUD actions for Venue model.
@@ -18,8 +19,7 @@ class VenueController extends Controller {
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -38,7 +38,6 @@ class VenueController extends Controller {
             ],
         ];
     }
-
 
     /**
      * Lists all Venue models.
@@ -75,16 +74,21 @@ class VenueController extends Controller {
         $model = new Venue();
 
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            $venue_photos = \yii\web\UploadedFile::getInstances($model, 'venue_photos');
+            $model->venue_occasions = $_POST['Venue']['venue_occasions'];
 
-            
-            foreach ($venue_photos as $venue_photo) 
-                $model->uploadVenuePhoto($venue_photo->tempName);
-            
+            if ($model->save()) {
+                $venue_photos = \yii\web\UploadedFile::getInstances($model, 'venue_photos');
 
-            return $this->redirect(['view', 'id' => $model->venue_uuid]);
+                if (sizeof($venue_photos) > 0) {
+                    foreach ($venue_photos as $venue_photo)
+                        $model->uploadVenuePhoto($venue_photo->tempName);
+                }
+
+
+                return $this->redirect(['view', 'id' => $model->venue_uuid]);
+            }
         }
 
         return $this->render('create', [
@@ -101,14 +105,17 @@ class VenueController extends Controller {
      */
     public function actionUpdate($id) {
         $model = $this->findModel($id);
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
             $venue_photos = \yii\web\UploadedFile::getInstances($model, 'venue_photos');
 
-            foreach ($venue_photos as $venue_photo) {
-                $model->uploadVenuePhoto($venue_photo->tempName);
+            if (sizeof($venue_photos) > 0) {
+             
+                $model->deleteAllVenuePhotos();
+                foreach ($venue_photos as $venue_photo)
+                    $model->uploadVenuePhoto($venue_photo->tempName);
             }
+
 
             return $this->redirect(['view', 'id' => $model->venue_uuid]);
         }
