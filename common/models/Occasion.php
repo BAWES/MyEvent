@@ -1,0 +1,54 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "occasion".
+ *
+ * @property int $occasion_uuid
+ * @property string $occasion_name
+ *
+ * @property VenueOccasion[] $venueOccasions
+ */
+class Occasion extends \yii\db\ActiveRecord
+{
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'occasion';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['occasion_name'], 'required'],
+            [['occasion_name'], 'string', 'max' => 255],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'occasion_uuid' => 'Occasion Uuid',
+            'occasion_name' => 'Occasion Name',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVenueOccasions()
+    {
+        return $this->hasMany(VenueOccasion::className(), ['occasion_uuid' => 'occasion_uuid']);
+    }
+}
