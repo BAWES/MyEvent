@@ -159,7 +159,20 @@ class Venue extends \yii\db\ActiveRecord {
         $this->deleteAllVenuePhotos();
         return parent::beforeDelete();
     }
-
+    
+    /**
+     * 
+     */
+    public function getVenuePhotosURL(){
+    
+        foreach (VenuePhoto::find()->all() as $venue_photo) {
+            Yii::error('lol ->'. json_encode($venue_photo) );
+            $url = 'https://res.cloudinary.com/my-event/image/upload/v1577777967/venue-photos/' . $venue_photo->photo_url;
+            $photos_urls [] = $url ;
+        }
+        return $photos_urls;
+        
+    }
     /**
      * Promotes current venue to draft venue while disabling rest
      */

@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'occasion_uuid',
+//            'occasion_uuid',
             'occasion_name',
 
             ['class' => 'yii\grid\ActionColumn'],

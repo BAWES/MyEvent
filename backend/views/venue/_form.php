@@ -6,6 +6,7 @@ use common\models\User;
 use common\models\Occasion;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
+use kartik\file\FileInput;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Venue */
@@ -29,14 +30,14 @@ use kartik\select2\Select2;
     <?=
     $form->field($model, 'venue_occasions')->widget(Select2::classname(), [
         'data' => $occasionArray,
-         'size' => Select2::MEDIUM,
+        'size' => Select2::MEDIUM,
         'showToggleAll' => false,
         'options' => ['placeholder' => 'Select ccasions ...'],
         'pluginOptions' => [
             'allowClear' => true,
-             'multiple' => true
+            'multiple' => true
         ],
-    ]);
+    ])->label('Occasion');
     ?>
 
     <?= $form->field($model, 'venue_name')->textInput(['maxlength' => true]) ?>
@@ -63,13 +64,25 @@ use kartik\select2\Select2;
 
     <?= $form->field($model, 'venue_restrictions')->textarea(['rows' => 6]) ?>
 
-<?= $form->field($model, 'venue_photos[]')->fileInput(['multiple' => true]) ?>
+    <?=
+    $form->field($model, 'venue_photos[]')->widget(FileInput::classname(), [
+        'options' => ['accept' => 'image/*', 'multiple' => true
+        ],
+        'pluginOptions' => [
+            'showUpload' => false,
+            'initialPreview' => $model->getVenuePhotosURL(),
+            'initialPreviewAsData' => true,
+            'overwriteInitial' => true,
+            'maxFileSize' => 2800
+        ]
+    ]);
+    ?>
 
 
     <div class="form-group">
-    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
 
-<?php ActiveForm::end(); ?>
+    <?php ActiveForm::end(); ?>
 
 </div>

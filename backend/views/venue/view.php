@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use common\models\Venue;
+use slavkovrn\imagecarousel\ImageCarouselWidget;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Venue */
@@ -50,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ])
             ?>
-    <?php } ?>
+        <?php } ?>
 
 
 
@@ -78,5 +79,25 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ])
     ?>
+
+    <?php
+    foreach ($model->getVenuePhotosURL() as $venuePhotoUrl) {
+        $venuePhotos [] = [
+            'src' => $venuePhotoUrl,
+        ];
+    }
+
+
+    echo ImageCarouselWidget::widget([
+        'id' => 'image-carousel', // unique id of widget
+        'width' => 960, // width of widget container
+        'height' => 300, // height of widget container
+        'img_width' => 320, // width of central image
+        'img_height' => 180, // height of central image
+        'images' => $venuePhotos
+    ])
+    ?>
+
+
 
 </div>
