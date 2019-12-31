@@ -165,11 +165,13 @@ class Venue extends \yii\db\ActiveRecord {
      */
     public function getVenuePhotosURL(){
     
+        $photos_urls = [];
         foreach (VenuePhoto::find()->all() as $venue_photo) {
             Yii::error('lol ->'. json_encode($venue_photo) );
             $url = 'https://res.cloudinary.com/my-event/image/upload/v1577777967/venue-photos/' . $venue_photo->photo_url;
             $photos_urls [] = $url ;
         }
+        
         return $photos_urls;
         
     }
