@@ -175,6 +175,7 @@ class Venue extends \yii\db\ActiveRecord {
         return $photos_urls;
         
     }
+    
     /**
      * Promotes current venue to draft venue while disabling rest
      */

@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use common\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
@@ -14,18 +15,36 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
+    <p style='text-align: center'>
         <?= Html::a('Update', ['update', 'id' => $model->user_uuid], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->user_uuid], [
+        <?=
+        Html::a('Delete', ['delete', 'id' => $model->user_uuid], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
                 'method' => 'post',
             ],
-        ]) ?>
+        ])
+        ?>
+
+        <?php if ($model->user_email_verified == User::EMAIL_NOT_VERIFIED) { ?>
+            <?=
+            Html::a('Verify', ['verify-user', 'id' => $model->venue_uuid], [
+                'class' => 'btn btn-success',
+                'data' => [
+//                    'confirm' => 'Are you sure you want to promote this project to draft?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+        <?php } ?>
+
+
+
     </p>
 
-    <?= DetailView::widget([
+    <?=
+    DetailView::widget([
         'model' => $model,
         'attributes' => [
             // 'user_uuid',
@@ -42,6 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'user_created_at:datetime',
             'user_updated_at:datetime',
         ],
-    ]) ?>
+    ])
+    ?>
 
 </div>

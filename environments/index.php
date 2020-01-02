@@ -32,6 +32,8 @@ return [
     'Development - Saoud' => [
         'path' => 'dev-saoud',
         'setWritable' => [
+            'api/runtime',
+            'api/web/assets',
             'backend/runtime',
             'backend/web/assets',
             'console/runtime',
@@ -44,6 +46,7 @@ return [
         ],
         'setCookieValidationKey' => [
             'backend/config/main-local.php',
+            'api/config/main-local.php',
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
         ],
@@ -51,6 +54,8 @@ return [
     'Development - Khalid' => [
         'path' => 'dev-khalid',
         'setWritable' => [
+            'api/runtime',
+            'api/web/assets',
             'backend/runtime',
             'backend/web/assets',
             'console/runtime',
@@ -63,6 +68,7 @@ return [
         ],
         'setCookieValidationKey' => [
             'backend/config/main-local.php',
+            'api/config/main-local.php',
             'common/config/codeception-local.php',
             'frontend/config/main-local.php',
         ],
@@ -70,6 +76,8 @@ return [
     'Production' => [
         'path' => 'prod',
         'setWritable' => [
+            'api/runtime',
+            'api/web/assets',
             'backend/runtime',
             'backend/web/assets',
             'console/runtime',
@@ -80,6 +88,7 @@ return [
             'yii',
         ],
         'setCookieValidationKey' => [
+            'api/config/main-local.php',
             'backend/config/main-local.php',
             'frontend/config/main-local.php',
         ],

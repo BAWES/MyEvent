@@ -66,6 +66,7 @@ class m130524_201442_init extends Migration
             'user_password_hash' => $this->string()->notNull(),
             'user_password_reset_token' => $this->string()->unique(),
             'user_status' => $this->smallInteger()->notNull()->defaultValue(10),
+            'user_email_verified' => $this->boolean()->defaultValue(0),
             'user_created_at' => $this->datetime()->notNull(),
             'user_updated_at' => $this->datetime()->notNull(),
         ], $tableOptions);

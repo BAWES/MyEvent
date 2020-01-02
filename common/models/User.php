@@ -20,6 +20,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string $user_password_hash
  * @property string $user_password_reset_token
  * @property int $user_status
+ * @property int $user_email_verified
  * @property int $user_created_at
  * @property int $user_updated_at
  */
@@ -33,6 +34,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
 
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
+    const EMAIL_NOT_VERIFIED = 0;
+    const EMAIL_VERIFIED = 1;
 
     /**
      * {@inheritdoc}
@@ -57,6 +60,17 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
             [['user_email'], 'unique'],
             [['user_password_reset_token'], 'unique'],
         ];
+    }
+
+    /**
+     * Scenarios for validation and massive assignment
+     */
+    public function scenarios() {
+        $scenarios = parent::scenarios();
+
+        $scenarios['signup'] = ['user_email', 'tempPassword', 'user_name', 'user_email'];
+
+        return $scenarios;
     }
 
     /**
@@ -98,6 +112,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
             'user_password_hash' => 'Password',
             'user_password_reset_token' => 'Password Reset Token',
             'user_status' => 'Status',
+            'user_email_verified' => 'Email Verified',
             'user_created_at' => 'Created At',
             'user_updated_at' => 'Updated At',
             'tempPassword' => 'Password'
@@ -141,6 +156,85 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
         }
     }
 
+    /**
+     * Signs user (candidate) up.
+     * @param boolean $validate - whether to validate before Signing up
+     * @return boolean is success
+     */
+    public function signup($validate = true) {
+        $this->setPassword($this->user_password_hash);
+
+        if ($this->save($validate)) {
+
+
+            if ($this->user_email_verified == static::EMAIL_NOT_VERIFIED) {
+                $this->sendVerificationEmail();
+            }
+
+
+            return true;
+        }
+
+        return false;
+    }
+
+        /**
+     * Sends an email requesting a user to verify his email address
+     * @return boolean whether the email was sent
+     */
+    public function sendVerificationEmail() {
+
+        $this->generateAuthKey();
+
+        return Yii::$app->mailer->compose([
+                            'html' => 'emailVerify-html',
+                            'text' => 'emailVerify-text',
+                                ], [
+                            'user' => $this
+                        ])
+                        ->setFrom([\Yii::$app->params['supportEmail']])
+                        ->setTo($this->user_email)
+                        ->setSubject('Please confirm your email address')
+                        ->send();
+    }
+
+    /**
+     * Verify user
+     */
+    public function verifyUser() {
+        $this->user_email_verified = User::EMAIL_VERIFIED;
+        $this->save(false);
+    }
+    
+        /**
+     * Create an Access Token Record for this candidate
+     * if the candidate already has one, it will return it instead
+     * @return \common\models\CandidateToken
+     */
+    public function getAccessToken() {
+
+        // Return existing inactive token if found
+        $token = CandidateToken::findOne([
+                    'candidate_uuid' => $this->candidate_uuid,
+                    'token_status' => CandidateToken::STATUS_ACTIVE
+        ]);
+
+        if ($token) {
+            return $token;
+        }
+
+        // Create new token
+
+        $token = new CandidateToken();
+        $token->candidate_uuid = $this->candidate_uuid;
+        $token->token_value = CandidateToken::generateUniqueTokenString();
+        $token->token_status = CandidateToken::STATUS_ACTIVE;
+        $token->save();
+
+        return $token;
+    }
+    
+    
     /**
      * {@inheritdoc}
      */
