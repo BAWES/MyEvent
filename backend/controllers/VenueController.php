@@ -178,12 +178,4 @@ class VenueController extends Controller {
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-    
-    public function getVenuePhotos(){
-        return [
-                "http://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/631px-FullMoon2010.jpg",
-                "http://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Earth_Eastern_Hemisphere.jpg/600px-Earth_Eastern_Hemisphere.jpg"
-            ];
-    }
-
 }
