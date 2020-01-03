@@ -2,10 +2,9 @@
 
 use yii\db\Migration;
 
-class m130524_201442_init extends Migration
-{
-    public function up()
-    {
+class m130524_201442_init extends Migration {
+
+    public function up() {
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
@@ -25,8 +24,8 @@ class m130524_201442_init extends Migration
             'admin_status' => $this->smallInteger()->notNull()->defaultValue(10),
             'admin_created_at' => $this->datetime()->notNull(),
             'admin_updated_at' => $this->datetime()->notNull(),
-        ], $tableOptions);
-        
+                ], $tableOptions);
+
         // Add Saoud as Base Admin
         $sql = 'INSERT INTO admin SET
             admin_id = 1,
@@ -40,7 +39,7 @@ class m130524_201442_init extends Migration
             admin_updated_at = "2018-08-21 19:40:58"
             ';
         Yii::$app->db->createCommand($sql)->execute();
-        
+
         // Add Khalid as Base Admin
         $sql = 'INSERT INTO admin SET
             admin_id = 2,
@@ -54,12 +53,12 @@ class m130524_201442_init extends Migration
             admin_updated_at = "2018-08-21 19:40:58"
             ';
         Yii::$app->db->createCommand($sql)->execute();
-        
+
         /**
          * Create User Table
          */
         $this->createTable('{{%user}}', [
-            'user_uuid' =>  $this->char(36)->notNull(),
+            'user_uuid' => $this->char(36)->notNull(),
             'user_name' => $this->string()->notNull()->unique(),
             'user_email' => $this->string()->notNull()->unique(),
             'user_auth_key' => $this->string(32)->notNull(),
@@ -67,29 +66,54 @@ class m130524_201442_init extends Migration
             'user_password_reset_token' => $this->string()->unique(),
             'user_status' => $this->smallInteger()->notNull()->defaultValue(10),
             'user_email_verified' => $this->boolean()->defaultValue(0),
+            'user_limit_email' => $this->dateTime(),
             'user_created_at' => $this->datetime()->notNull(),
             'user_updated_at' => $this->datetime()->notNull(),
-        ], $tableOptions);
-        
+                ], $tableOptions);
+
         $this->addPrimaryKey('PK', 'user', 'user_uuid');
-        
-         /**
+
+        /**
          * Create Occasion Table
          * Occasion for an event. Such as wedding, birthday, valentines, etc.
          */
-         $this->createTable('{{%occasion}}', [
+        $this->createTable('{{%occasion}}', [
             'occasion_uuid' => $this->char(36)->notNull(),
             'occasion_name' => $this->string()->notNull(),
-        ], $tableOptions);
-         
+                ], $tableOptions);
+
         $this->addPrimaryKey('PK', 'occasion', 'occasion_uuid');
 
-                 
-         /**
+        
+        $this->createTable('user_token', [
+            'token_id' => $this->bigPrimaryKey()->unsigned(),
+            'user_uuid' => $this->char(36)->notNull(),
+            'token_value' => $this->string()->notNull(),
+            'token_device' => $this->string(),
+            'token_device_id' => $this->string(),
+            'token_status' => $this->smallInteger()->notNull(),
+            'token_last_used_datetime' => $this->datetime(),
+            'token_expiry_datetime' => $this->datetime(),
+            'token_created_datetime' => $this->datetime()->notNull(),
+          ], $tableOptions);
+
+        // creates index for column `user_uuid`
+        $this->createIndex(
+                'idx-user_token-user_uuid',
+                'user_token',
+                'user_uuid'
+        );
+
+        // add foreign key for `user_uuid` in table `venue`
+        $this->addForeignKey(
+                'fk-user_token-user_uuid', 'user_token', 'user_uuid', 'user', 'user_uuid', 'CASCADE'
+        );
+        
+        /**
          * Create Venue Table
          */
-         $this->createTable('{{%venue}}', [
-            'venue_uuid' =>  $this->char(36)->notNull(),
+        $this->createTable('{{%venue}}', [
+            'venue_uuid' => $this->char(36)->notNull(),
             'user_uuid' => $this->char(36)->notNull(),
             'venue_name' => $this->string()->notNull(),
             'venue_location' => $this->string(),
@@ -104,168 +128,142 @@ class m130524_201442_init extends Migration
             'venue_capacity_maximum' => $this->integer(),
             'venue_operating_hours' => $this->text(),
             'venue_restrictions' => $this->text(),
-        ], $tableOptions);
-         
+                ], $tableOptions);
+
         $this->addPrimaryKey('PK', 'venue', 'venue_uuid');
 
-                 
-         // creates index for column `user_uuid` in venue table
-         $this->createIndex(
-             'idx-venue-user_uuid',
-             'venue',
-             'user_uuid'
-         );
+
+        // creates index for column `user_uuid` in venue table
+        $this->createIndex(
+                'idx-venue-user_uuid', 'venue', 'user_uuid'
+        );
 
 
-         // add foreign key for `user_uuid` in table `venue`
-         $this->addForeignKey(
-             'fk-venue-user_uuid',
-             'venue',
-             'user_uuid',
-             'user',
-             'user_uuid',
-             'CASCADE'
-         );
-         
-        
-         /**
+        // add foreign key for `user_uuid` in table `venue`
+        $this->addForeignKey(
+                'fk-venue-user_uuid', 'venue', 'user_uuid', 'user', 'user_uuid', 'CASCADE'
+        );
+
+
+        /**
          * Create Venue Occasion Table
          * Relation between venue and occasion
          */
-         $this->createTable('{{%venue_occasion}}', [
+        $this->createTable('{{%venue_occasion}}', [
             'venue_uuid' => $this->char(36)->notNull(),
             'occasion_uuid' => $this->char(36)->notNull(),
-            
-        ], $tableOptions);
-         
-         // creates index for column `venue_uuid` in venue_occasion table
-         $this->createIndex(
-             'idx-venue-occasion-venue_uuid',
-             'venue_occasion',
-             'venue_uuid'
-         );
+                ], $tableOptions);
 
-         // add foreign key for `venue_uuid` in table `venue`
-         $this->addForeignKey(
-             'fk-venue-occasion-venue_uuid',
-             'venue_occasion',
-             'venue_uuid',
-             'venue',
-             'venue_uuid',
-             'CASCADE'
-         );
-         
-                 
-         
-         // creates index for column `occasion_uuid` in venue_occasion table
-         $this->createIndex(
-             'idx-venue-occasion-occasion_uuid',
-             'venue_occasion',
-             'occasion_uuid'
-         );
+        // creates index for column `venue_uuid` in venue_occasion table
+        $this->createIndex(
+                'idx-venue-occasion-venue_uuid', 'venue_occasion', 'venue_uuid'
+        );
 
-         // add foreign key for `occasion_uuid` in table `venue`
-         $this->addForeignKey(
-             'fk-venue-occasion-occasion_uuid',
-             'venue_occasion',
-             'occasion_uuid',
-             'occasion',
-             'occasion_uuid',
-             'CASCADE'
-         );
-         
+        // add foreign key for `venue_uuid` in table `venue`
+        $this->addForeignKey(
+                'fk-venue-occasion-venue_uuid', 'venue_occasion', 'venue_uuid', 'venue', 'venue_uuid', 'CASCADE'
+        );
+
+
+
+        // creates index for column `occasion_uuid` in venue_occasion table
+        $this->createIndex(
+                'idx-venue-occasion-occasion_uuid', 'venue_occasion', 'occasion_uuid'
+        );
+
+        // add foreign key for `occasion_uuid` in table `venue`
+        $this->addForeignKey(
+                'fk-venue-occasion-occasion_uuid', 'venue_occasion', 'occasion_uuid', 'occasion', 'occasion_uuid', 'CASCADE'
+        );
+
         /**
          * Create Venue Photo Table
          * Photos of a venue
          */
-         $this->createTable('{{%venue_photo}}', [
-            'photo_uuid' =>  $this->char(36)->notNull(),
+        $this->createTable('{{%venue_photo}}', [
+            'photo_uuid' => $this->char(36)->notNull(),
             'venue_uuid' => $this->char(36)->notNull(),
             'photo_url' => $this->string(),
             'photo_created_datetime' => $this->datetime(),
+                ], $tableOptions);
 
-        ], $tableOptions);
-         
-                 
+
         $this->addPrimaryKey('PK', 'venue_photo', 'photo_uuid');
 
         // creates index for column `venue_uuid` in venue_photo table
-         $this->createIndex(
-             'idx-venue-photo-venue_uuid',
-             'venue_photo',
-             'venue_uuid'
-         );
+        $this->createIndex(
+                'idx-venue-photo-venue_uuid', 'venue_photo', 'venue_uuid'
+        );
 
-         // add foreign key for `venue_uuid` in table `venue_photo`
-         $this->addForeignKey(
-             'fk-venue-photo-venue_uuid',
-             'venue_photo',
-             'venue_uuid',
-             'venue',
-             'venue_uuid',
-             'CASCADE'
-         );
-         
+        // add foreign key for `venue_uuid` in table `venue_photo`
+        $this->addForeignKey(
+                'fk-venue-photo-venue_uuid', 'venue_photo', 'venue_uuid', 'venue', 'venue_uuid', 'CASCADE'
+        );
     }
 
-    public function down()
-    {
+    public function down() {
         // drops ForeignKey for column `user_uuid`
         $this->dropForeignKey(
-            'fk-venue-user_uuid',
-            'venue'
-        ); 
-        
+                'fk-venue-user_uuid', 'venue'
+        );
+
         // drops index for column `user_uuid`
         $this->dropIndex(
-            'idx-venue-user_uuid',
-            'venue'
+                'idx-venue-user_uuid', 'venue'
         );
-        
-   
+
+
         // drops ForeignKey for column `venue_uuid`
         $this->dropForeignKey(
-            'fk-venue-occasion-venue_uuid',
-            'venue_occasion'
-        );   
-        
+                'fk-venue-occasion-venue_uuid', 'venue_occasion'
+        );
+
         // drops index for column `venue_uuid`
         $this->dropIndex(
-            'idx-venue-occasion-venue_uuid',
-            'venue_occasion'
+                'idx-venue-occasion-venue_uuid', 'venue_occasion'
         );
-        
+
         // drops ForeignKey for column `occasion_uuid`
         $this->dropForeignKey(
-            'fk-venue-occasion-occasion_uuid',
-            'venue_occasion'
-        );   
-        
-       // drops index for column `occasion_uuid`
-        $this->dropIndex(
-            'idx-venue-occasion-occasion_uuid',
-            'venue_occasion'
+                'fk-venue-occasion-occasion_uuid', 'venue_occasion'
         );
-        
-    
+
+        // drops index for column `occasion_uuid`
+        $this->dropIndex(
+                'idx-venue-occasion-occasion_uuid', 'venue_occasion'
+        );
+
+
         // drops ForeignKey for column `venue_uuid`
         $this->dropForeignKey(
-            'fk-venue-photo-venue_uuid',
-            'venue_photo'
-        ); 
-        
+                'fk-venue-photo-venue_uuid', 'venue_photo'
+        );
+
         // drops index for column `venue_uuid`
         $this->dropIndex(
-            'idx-venue-photo-venue_uuid',
-            'venue_photo'
+                'idx-venue-photo-venue_uuid', 'venue_photo'
         );
         
+        // drops ForeignKey for column `user_uuid`
+        $this->dropForeignKey(
+                'fk-user_token-user_uuid',
+                'user_token'
+        );
+
+        // drops index for column `user_uuid`
+        $this->dropIndex(
+                'idx-user_token-user_uuid',
+                'user_token'
+        );
+
         //Drop all tables
         $this->dropTable('{{%admin}}');
         $this->dropTable('{{%user}}');
+        $this->dropTable('{{%user_token}}');
         $this->dropTable('{{%occasion}}');
         $this->dropTable('{{%venue}}');
         $this->dropTable('{{%venue_occasion}}');
         $this->dropTable('{{%venue_photo}}');
     }
+
 }

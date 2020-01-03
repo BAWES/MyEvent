@@ -1,7 +1,9 @@
 <?php
-
 $params = array_merge(
-        require(__DIR__ . '/../../common/config/params.php'), require(__DIR__ . '/../../common/config/params-local.php'), require(__DIR__ . '/params.php'), require(__DIR__ . '/params-local.php')
+    require(__DIR__ . '/../../common/config/params.php'),
+    require(__DIR__ . '/../../common/config/params-local.php'),
+    require(__DIR__ . '/params.php'),
+    require(__DIR__ . '/params-local.php')
 );
 
 return [
@@ -11,34 +13,51 @@ return [
     'bootstrap' => ['log'],
     'modules' => [
         'v1' => [
-            'basePath' => '@api/modules/v1',
             'class' => 'api\modules\v1\Module',
         ],
     ],
     'components' => [
-        'authClientCollection' => [
-            'class' => 'yii\authclient\Collection',
-            'clients' => [
-                'google' => [
-                    'class' => 'yii\authclient\clients\Google',
-                    'clientId' => '32997776097-fiqqh2du8lnrhcrphv29rd0onfgvb2tj.apps.googleusercontent.com',
-                    'clientSecret' => 'duQ9G756vgiBbwckNOcllxEk',
-                    'validateAuthState' => false
-                ],
-            ],
-        ],
         'request' => [
-            'enableCookieValidation' => false,
             // Accept and parse JSON Requests
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ]
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'api\models\User',
             'enableAutoLogin' => false,
             'enableSession' => false,
             'loginUrl' => null
+        ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'enableStrictParsing' => true,
+            'showScriptName' => false,
+            'rules' => [
+                [ // AuthController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/auth',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET login' => 'login',
+                        'PATCH verify-email' => 'verify-email',
+                        'PATCH update-password' => 'update-password',
+                        'POST create-account' => 'create-account',
+                        'POST request-reset-password' => 'request-reset-password',
+//                        'POST resend-verification-email' => 'resend-verification-email',
+//                        'POST validate' => 'validate',
+                        // OPTIONS VERBS
+                        'OPTIONS verify-email' => 'options',
+//                        'OPTIONS validate' => 'options',
+                        'OPTIONS login' => 'options',
+                        'OPTIONS create-account' => 'options',
+                        'OPTIONS update-password' => 'options',
+                        'OPTIONS request-reset-password' => 'options',
+//                        'OPTIONS resend-verification-email' => 'options',
+                    ]
+                ],
+  
+            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -47,23 +66,6 @@ return [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
-            ],
-        ],
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
-            'showScriptName' => false,
-            'rules' => [
-                [// SiteController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/auth',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'POST signup' => 'signup',
-                        // OPTIONS VERBS
-                        'OPTIONS signup' => 'options',
-                    ]
-                ]
             ],
         ],
     ],

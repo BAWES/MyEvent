@@ -21,6 +21,7 @@ use yii\behaviors\AttributeBehavior;
  * @property string $user_password_reset_token
  * @property int $user_status
  * @property int $user_email_verified
+ * @property int $user_limit_email
  * @property int $user_created_at
  * @property int $user_updated_at
  */
@@ -113,6 +114,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
             'user_password_reset_token' => 'Password Reset Token',
             'user_status' => 'Status',
             'user_email_verified' => 'Email Verified',
+            'user_limit_email' => 'Limit Email',
             'user_created_at' => 'Created At',
             'user_updated_at' => 'Updated At',
             'tempPassword' => 'Password'
@@ -157,40 +159,54 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
     }
 
     /**
-     * Signs user (candidate) up.
-     * @param boolean $validate - whether to validate before Signing up
-     * @return boolean is success
+     * Signs user up.
+     * @return static|null the saved model or null if saving fails
      */
-    public function signup($validate = true) {
+    public function signup() {
+        $oldPasswordInput = $this->user_password_hash;
+
         $this->setPassword($this->user_password_hash);
+        $this->generateAuthKey();
 
-        if ($this->save($validate)) {
+        if ($this->save()) {
+            $this->sendVerificationEmail();
 
+            //Log user signup
+//            Yii::info("[New User Signup Manual] ".$this->user_email, __METHOD__);
 
-            if ($this->user_email_verified == static::EMAIL_NOT_VERIFIED) {
-                $this->sendVerificationEmail();
-            }
-
-
-            return true;
+            return $this;
+        } else {
+            //Reset password to hide encrypted value
+            $this->user_password_hash = $oldPasswordInput;
         }
 
-        return false;
+        return null;
     }
 
-        /**
+    /**
      * Sends an email requesting a user to verify his email address
      * @return boolean whether the email was sent
      */
     public function sendVerificationEmail() {
 
-        $this->generateAuthKey();
+        //Update user last email limit timestamp
+        $this->user_limit_email = new Expression('NOW()');
+        $this->save(false);
+
+        // Generate Reset Link
+        $verificationUrl = Yii::$app->urlManager->createAbsoluteUrl([
+            'auth/verify-email',
+            'code' => $this->user_auth_key,
+            'verify' => $this->user_uuid
+        ]);
+
 
         return Yii::$app->mailer->compose([
                             'html' => 'emailVerify-html',
                             'text' => 'emailVerify-text',
                                 ], [
-                            'user' => $this
+                            'user' => $this,
+                            'verificationUrl' => $verificationUrl
                         ])
                         ->setFrom([\Yii::$app->params['supportEmail']])
                         ->setTo($this->user_email)
@@ -205,36 +221,32 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
         $this->user_email_verified = User::EMAIL_VERIFIED;
         $this->save(false);
     }
-    
-        /**
-     * Create an Access Token Record for this candidate
-     * if the candidate already has one, it will return it instead
-     * @return \common\models\CandidateToken
+
+    /**
+     * Create an Access Token Record for this User
+     * if the user already has one, it will return it instead
+     * @return \common\models\UserToken
      */
     public function getAccessToken() {
-
         // Return existing inactive token if found
-        $token = CandidateToken::findOne([
-                    'candidate_uuid' => $this->candidate_uuid,
-                    'token_status' => CandidateToken::STATUS_ACTIVE
+        $token = UserToken::findOne([
+                    'user_uuid' => $this->user_uuid,
+                    'token_status' => UserToken::STATUS_ACTIVE
         ]);
-
         if ($token) {
             return $token;
         }
 
-        // Create new token
-
-        $token = new CandidateToken();
-        $token->candidate_uuid = $this->candidate_uuid;
-        $token->token_value = CandidateToken::generateUniqueTokenString();
-        $token->token_status = CandidateToken::STATUS_ACTIVE;
-        $token->save();
+        // Create new inactive token
+        $token = new UserToken();
+        $token->user_uuid = $this->user_uuid;
+        $token->token_value = UserToken::generateUniqueTokenString();
+        $token->token_status = UserToken::STATUS_ACTIVE;
+        $token->save(false);
 
         return $token;
     }
-    
-    
+
     /**
      * {@inheritdoc}
      */
@@ -243,10 +255,13 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function findIdentityByAccessToken($token, $type = null) {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        $token = UserToken::find()->where(['token_value' => $token])->with('user')->one();
+        if ($token) {
+            return $token->user;
+        }
     }
 
     /**

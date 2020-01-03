@@ -20,8 +20,22 @@ Yii2 backend for MyEvent: Find a venue
 * user_password_hash
 * user_password_reset_token
 * user_status
+* user_email_verified
+* user_limit_email
 * user_created_at
 * user_updated_at
+
+### User Token
+
+* token_id
+* user_uuid
+* token_value
+* token_device
+* token_device_id
+* token_status
+* token_last_used_datetime
+* token_expiry_datetime
+* token_created_datetime
 
 ### Occasion
 

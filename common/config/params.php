@@ -5,7 +5,7 @@ return [
     'supportEmail' => 'support@example.com',
     'senderEmail' => 'noreply@example.com',
     'senderName' => 'Example.com mailer',
-    'user.passwordResetTokenExpire' => 3600,
+    'user.passwordResetTokenExpire' => 30600,
     'allowedOrigins' => [
         //'https://api.yo3an.io/',
         //Dev Envs
