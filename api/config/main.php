@@ -24,7 +24,7 @@ return [
             ]
         ],
         'user' => [
-            'identityClass' => 'api\models\User',
+            'identityClass' => 'common\models\User',
             'enableAutoLogin' => false,
             'enableSession' => false,
             'loginUrl' => null
@@ -44,16 +44,42 @@ return [
                         'PATCH update-password' => 'update-password',
                         'POST create-account' => 'create-account',
                         'POST request-reset-password' => 'request-reset-password',
-//                        'POST resend-verification-email' => 'resend-verification-email',
-//                        'POST validate' => 'validate',
                         // OPTIONS VERBS
                         'OPTIONS verify-email' => 'options',
-//                        'OPTIONS validate' => 'options',
                         'OPTIONS login' => 'options',
                         'OPTIONS create-account' => 'options',
                         'OPTIONS update-password' => 'options',
                         'OPTIONS request-reset-password' => 'options',
-//                        'OPTIONS resend-verification-email' => 'options',
+                    ]
+                ],
+                [ // UserController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/user',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'details',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
+                [ // OccasionController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/occasion',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
+                [ // VenueController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/venue',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST' => 'create-venue',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
                     ]
                 ],
   

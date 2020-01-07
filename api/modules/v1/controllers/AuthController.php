@@ -97,13 +97,13 @@ class AuthController extends Controller {
 
         // Return user access token if everything valid
         $accessToken = $user->accessToken->token_value;
-        
+
         return [
             "operation" => "success",
             "token" => $accessToken,
-            "userId" => $user->user_uuid,
-            "name" => $user->user_name,
-            "email" => $user->user_email
+            "user_uuid" => $user->user_uuid,
+            "user_name" => $user->user_name,
+            "user_email" => $user->user_email
         ];
     }
 
@@ -135,7 +135,9 @@ class AuthController extends Controller {
 
         return [
             "operation" => "success",
-            "message" => "Please click on the link sent to you by email to verify your account"
+            "user_uuid" => $model->user_uuid,
+            "message" => "Please click on the link sent to you by email to verify your account",
+            "unVerifiedToken" => $this->_loginResponse($model)
         ];
     }
 
@@ -189,14 +191,14 @@ class AuthController extends Controller {
      * @return array
      */
     public function actionVerifyEmail() {
-        
+
         $code = Yii::$app->request->getBodyParam("code");
         $verify = Yii::$app->request->getBodyParam("verify");
 
-        
+
         //Code is his auth key, check if code is valid
-        $user = User::findOne(['user_auth_key' => $code]);
-        
+        $user = User::findOne(['user_auth_key' => $code, 'user_uuid' => $verify]);
+
         if ($user) {
             //If not verified
             if ($user->user_email_verified == User::EMAIL_NOT_VERIFIED) {
@@ -247,8 +249,7 @@ class AuthController extends Controller {
                     $minuteDifference = (int) $difference->i;
                     $secondDifference = (int) $difference->s;
 
-                    $errors = "Email was sent previously, you may request another one in " . $minuteDifference . " minutes and " . $secondDifference .  " seconds";
-                   
+                    $errors = "Email was sent previously, you may request another one in " . $minuteDifference . " minutes and " . $secondDifference . " seconds";
                 } elseif (!$model->sendEmail($user)) {
                     $errors = 'Sorry, we are unable to reset password for email provided.';
                 }
@@ -277,7 +278,7 @@ class AuthController extends Controller {
      * @return array
      */
     public function actionUpdatePassword() {
-         $token = Yii::$app->request->getBodyParam("token");
+        $token = Yii::$app->request->getBodyParam("token");
         $newPassword = Yii::$app->request->getBodyParam("newPassword");
 
         $user = User::findByPasswordResetToken($token);
@@ -297,4 +298,25 @@ class AuthController extends Controller {
             'message' => 'Your password has been reset.'
         ];
     }
+
+    /**
+     * Return candidate data after successful login
+     * @param type $user
+     * @return type
+     */
+    private function _loginResponse($user) {
+
+        // Return Candidate access token if everything valid
+
+        $accessToken = $user->accessToken->token_value;
+
+        return [
+            "operation" => "success",
+            "token" => $accessToken,
+            "id" => $user->user_uuid,
+            "username" => $user->user_name,
+            "email" => $user->user_email
+        ];
+    }
+
 }

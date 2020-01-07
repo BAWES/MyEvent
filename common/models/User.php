@@ -233,6 +233,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface {
                     'user_uuid' => $this->user_uuid,
                     'token_status' => UserToken::STATUS_ACTIVE
         ]);
+        
         if ($token) {
             return $token;
         }
